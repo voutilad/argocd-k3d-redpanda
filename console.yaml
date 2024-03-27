@@ -8,7 +8,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/voutilad/argocd-k3d-redpanda.git
-    targetRevision: cluster
+    targetRevision: external
     path: console
   destination:
     server: https://kubernetes.default.svc
