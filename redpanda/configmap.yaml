@@ -231,15 +231,15 @@ data:
     name: default
     kafka_api:
       brokers: 
-          - redpanda-0:31092
-          - redpanda-1:31092
-          - redpanda-2:31092
+          - redpanda-broker-0:31092
+          - redpanda-broker-1:31092
+          - redpanda-broker-2:31092
       tls:
         ca_file: ca.crt
     admin_api:
       addresses: 
-          - redpanda-0:31644
-          - redpanda-1:31644
-          - redpanda-2:31644
+          - redpanda-broker-0:31644
+          - redpanda-broker-1:31644
+          - redpanda-broker-2:31644
       tls:
         ca_file: ca.crt

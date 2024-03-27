@@ -1,0 +1,32 @@
+image:
+  repository: docker.redpanda.com/redpandadata/redpanda
+  tag: v23.3.9
+  pullPolicy: Always
+
+resources:
+  cpu:
+    cores: 1
+    overprovisioned: true
+  memory:
+    container:
+      min: 2Gi
+      max: 2Gi
+
+tls:
+  enabled: true
+
+statefulset:
+  budget:
+    maxUnavailable: 1
+  initContainers:
+    setDataDirOwnership:
+      enabled: true
+
+external:
+  enabled: true
+  service:
+    enabled: false
+  addresses:
+  - redpanda-broker-0
+  - redpanda-broker-1
+  - redpanda-broker-2

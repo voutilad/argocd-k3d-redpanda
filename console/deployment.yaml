@@ -112,4 +112,3 @@ spec:
               value: "true"
             - name: REDPANDA_ADMINAPI_URLS
               value: https://redpanda.redpanda.svc.cluster.local.:9644
-
