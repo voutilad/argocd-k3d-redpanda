@@ -19,3 +19,10 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: redpanda
+  syncPolicy:
+    syncOptions:
+      - Validate=false
+      - PruneLast=true
+    automated:
+      prune: true
+      selfHeal: false
