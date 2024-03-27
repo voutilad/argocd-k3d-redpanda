@@ -53,6 +53,9 @@ spec:
         volumeMounts:
           - name: config
             mountPath: /etc/redpanda
+          - name: users
+            mountPath: /etc/secrets/users
+            readOnly: true
           - name: redpanda-default-cert
             mountPath: /etc/tls/certs/default
           - name: redpanda-external-cert
@@ -69,3 +72,6 @@ spec:
           secret:
             secretName: redpanda-external-cert
             defaultMode: 0o440
+        - name: users
+          secret:
+            secretName: redpanda-superusers

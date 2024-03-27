@@ -13,8 +13,8 @@ metadata:
 data: 
   
   bootstrap.yaml: |
-    kafka_enable_authorization: false
-    enable_sasl: false
+    kafka_enable_authorization: true
+    enable_sasl: true
     enable_rack_awareness: false
           
     default_topic_replications: 3
@@ -36,8 +36,8 @@ data:
     config_file: /etc/redpanda/redpanda.yaml
     redpanda:
       empty_seed_starts_cluster: false
-      kafka_enable_authorization: false
-      enable_sasl: false
+      kafka_enable_authorization: true
+      enable_sasl: true
       default_topic_replications: 3
       compacted_log_segment_size: 67108864
       group_topic_partitions: 16
@@ -78,9 +78,11 @@ data:
         - name: internal
           address: 0.0.0.0
           port: 9093
+          authentication_method: sasl
         - name: default
           address: 0.0.0.0
           port: 9094
+          authentication_method: sasl
       kafka_api_tls:
         - name: internal
           enabled: true
@@ -133,9 +135,11 @@ data:
         - name: internal
           address: 0.0.0.0
           port: 8081
+          authentication_method: http_basic
         - name: default
           address: 0.0.0.0
           port: 8084
+          authentication_method: http_basic
       schema_registry_api_tls:
         - name: internal
           enabled: true
@@ -169,9 +173,11 @@ data:
         - name: internal
           address: 0.0.0.0
           port: 8082
+          authentication_method: http_basic
         - name: default
           address: 0.0.0.0
           port: 8083
+          authentication_method: http_basic
       pandaproxy_api_tls:
         - name: internal
           enabled: true

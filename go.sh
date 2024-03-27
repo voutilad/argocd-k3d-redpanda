@@ -34,3 +34,15 @@ fi
 ### 2. Install ArgoCD
 kubectl apply -f argocd-ns.yaml
 kubectl apply -n argocd -f argocd.yaml
+
+### 3. Pre-init the Redpanda namespace so we can make a secret
+kubectl create ns redpanda
+
+PASSPHRASE="$(./passphrase/generate.sh | tr -d '\n')"
+
+echo ">> Creating Redpanda secret"
+
+kubectl create secret generic redpanda-superuser -n redpanda \
+    --from-file=superusers.txt=/dev/stdin << EOF
+admin:${PASSPHRASE}:SCRAM-SHA-256
+EOF

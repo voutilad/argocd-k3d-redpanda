@@ -20,7 +20,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
-        checksum-redpanda-chart/config: 9b98f0ff63c27ee306f6e826e2916b0a4f9479b25b07d4b598ed683aeb4c1c3c
+        checksum-redpanda-chart/config: dee29e2d6a73fe7ebeca8451b240fdc3470c7f9b3fee8c6ff7c9236589dd9ebf
       labels:
         app.kubernetes.io/name: console
         app.kubernetes.io/instance: redpanda
@@ -33,6 +33,9 @@ spec:
         - name: configs
           configMap:
             name: redpanda-console
+        - name: redpanda-users
+          secret:
+            secretName: redpanda-superusers
         - name: kafka-default-cert
           secret:
             defaultMode: 272
@@ -56,6 +59,7 @@ spec:
             secretName: redpanda-default-cert
       containers:
         - name: console
+          command: ["sh","-c","set -e; IFS=':' read -r KAFKA_SASL_USERNAME KAFKA_SASL_PASSWORD KAFKA_SASL_MECHANISM \u003c \u003c(grep \"\" $(find /mnt/users/* -print)); KAFKA_SASL_MECHANISM=${KAFKA_SASL_MECHANISM:-SCRAM-SHA-512}; export KAFKA_SASL_USERNAME KAFKA_SASL_PASSWORD KAFKA_SASL_MECHANISM;  export KAFKA_SCHEMAREGISTRY_USERNAME=$KAFKA_SASL_USERNAME;  export KAFKA_SCHEMAREGISTRY_PASSWORD=$KAFKA_SASL_PASSWORD;  /app/console $@","--"]
           args:
             - "--config.filepath=/etc/console/configs/config.yaml"
           securityContext:
@@ -69,6 +73,9 @@ spec:
           volumeMounts:
             - name: configs
               mountPath: /etc/console/configs
+              readOnly: true
+            - mountPath: /mnt/users
+              name: redpanda-users
               readOnly: true
             - mountPath: /mnt/cert/kafka/default
               name: kafka-default-cert

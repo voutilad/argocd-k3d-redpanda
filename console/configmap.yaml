@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -19,7 +20,7 @@ data:
       - redpanda-1.redpanda.redpanda.svc.cluster.local.:9093
       - redpanda-2.redpanda.redpanda.svc.cluster.local.:9093
       sasl:
-        enabled: false
+        enabled: true
       schemaRegistry:
         enabled: true
         tls:

@@ -28,7 +28,7 @@ spec:
         app.kubernetes.io/component: redpanda-statefulset
         redpanda.com/poddisruptionbudget: redpanda
       annotations:
-        config.redpanda.com/checksum: b712a101accff8049efe936334764178d7fe3d28fb42319de1f618a5c944519e
+        config.redpanda.com/checksum: 520ba6f9c17b50f013530c85b5e31790b7e3cab0fdc291218d45f02702ba585a
     spec:
       terminationGracePeriodSeconds: 90
       securityContext: 
@@ -50,6 +50,9 @@ spec:
             runAsGroup: 0
           volumeMounts: 
             
+            - name: users
+              mountPath: /etc/secrets/users
+              readOnly: true
             - name: redpanda-default-cert
               mountPath: /etc/tls/certs/default
             - name: redpanda-external-cert
@@ -61,6 +64,9 @@ spec:
           command: ["/bin/sh", "-c", "chown 101:101 -R /var/lib/redpanda/data"]
           volumeMounts: 
             
+            - name: users
+              mountPath: /etc/secrets/users
+              readOnly: true
             - name: redpanda-default-cert
               mountPath: /etc/tls/certs/default
             - name: redpanda-external-cert
@@ -94,6 +100,9 @@ spec:
             runAsGroup: 101
           volumeMounts: 
             
+            - name: users
+              mountPath: /etc/secrets/users
+              readOnly: true
             - name: redpanda-default-cert
               mountPath: /etc/tls/certs/default
             - name: redpanda-external-cert
@@ -211,6 +220,9 @@ spec:
             runAsGroup: 101
           volumeMounts: 
             
+            - name: users
+              mountPath: /etc/secrets/users
+              readOnly: true
             - name: redpanda-default-cert
               mountPath: /etc/tls/certs/default
             - name: redpanda-external-cert
@@ -239,6 +251,9 @@ spec:
             - 'trap "exit 0" TERM; exec /etc/secrets/config-watcher/scripts/sasl-user.sh & wait $!'
           volumeMounts: 
             
+            - name: users
+              mountPath: /etc/secrets/users
+              readOnly: true
             - name: redpanda-default-cert
               mountPath: /etc/tls/certs/default
             - name: redpanda-external-cert
@@ -257,6 +272,9 @@ spec:
           secret:
             secretName: redpanda-external-cert
             defaultMode: 0o440
+        - name: users
+          secret:
+            secretName: redpanda-superusers
         - name: lifecycle-scripts
           secret:
             secretName: redpanda-sts-lifecycle
