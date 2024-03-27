@@ -5,7 +5,7 @@ K3D_CLUSTER="${K3D_CLUSTER:-argocd}"
 DOMAIN="${DOMAIN:-customredpandadomain.local}"
 AGENTS="${AGENTS:-3}"
 SERVERS="${SERVERS:-1}"
-MEM="${MEM:-2G}"
+MEM="${MEM:-4G}"
 TOPIC="${TOPIC:-twitch_chat}"
 
 ### 0. Pre-requisites
@@ -23,7 +23,7 @@ echo "> Looking for existing k3d Redpanda cluster..."
 if ! k3d cluster list redpanda 2>&1 > /dev/null; then
     echo ">> Creating a new ${SERVERS} node cluster..."
     k3d cluster create "${K3D_CLUSTER}" \
-        --servers "${SERVERS}" --servers-memory "1.5g" \
+        --servers "${SERVERS}" --servers-memory "1.5G" \
 	--agents "${AGENTS}" --agents-memory "${MEM}" \
         --registry-create rp-registry
 else
