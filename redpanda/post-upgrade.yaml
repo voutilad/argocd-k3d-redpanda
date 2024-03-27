@@ -1,0 +1,71 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: redpanda-post-upgrade
+  namespace: "redpanda"
+  labels:
+    app.kubernetes.io/component: redpanda
+    app.kubernetes.io/instance: redpanda
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redpanda
+    helm.sh/chart: redpanda-5.7.35
+  annotations:
+    "helm.sh/hook": post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "-10"
+spec:
+  template:
+    metadata:
+      name: "redpanda"
+      labels:
+        app.kubernetes.io/name: redpanda
+        app.kubernetes.io/instance: "redpanda"
+        app.kubernetes.io/component: redpanda-post-upgrade
+    spec:
+      affinity:
+        {}
+      restartPolicy: Never
+      securityContext: 
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
+      serviceAccountName: default
+      containers:
+      - name: redpanda-post-upgrade
+        image: docker.redpanda.com/redpandadata/redpanda:v23.3.9
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            set -e
+    
+            rpk cluster config set default_topic_replications 3
+            rpk cluster config set storage_min_free_bytes 1073741824
+            if [ -d "/etc/secrets/users/" ]; then
+                IFS=":" read -r USER_NAME PASSWORD MECHANISM < <(grep "" $(find /etc/secrets/users/* -print))
+                curl -svm3 --fail --retry "120" --retry-max-time "120" --retry-all-errors --ssl-reqd \
+                --cacert /etc/tls/certs/default/ca.crt \
+                -X PUT -u ${USER_NAME}:${PASSWORD} \
+                https://redpanda.redpanda.svc.cluster.local.:9644/v1/debug/restart_service?service=schema-registry || true
+            fi
+        securityContext:
+          runAsGroup: 101
+          runAsUser: 101
+        volumeMounts:
+          - name: config
+            mountPath: /etc/redpanda
+          - name: redpanda-default-cert
+            mountPath: /etc/tls/certs/default
+          - name: redpanda-external-cert
+            mountPath: /etc/tls/certs/external
+      volumes: 
+        - name: config
+          configMap:
+            name: redpanda
+        - name: redpanda-default-cert
+          secret:
+            secretName: redpanda-default-cert
+            defaultMode: 0o440
+        - name: redpanda-external-cert
+          secret:
+            secretName: redpanda-external-cert
+            defaultMode: 0o440

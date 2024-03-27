@@ -1,0 +1,115 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redpanda-console
+  labels:
+    helm.sh/chart: console-0.7.24
+    app.kubernetes.io/name: console
+    app.kubernetes.io/instance: redpanda
+    app.kubernetes.io/version: "v2.4.5"
+    app.kubernetes.io/managed-by: Helm
+    
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: console
+      app.kubernetes.io/instance: redpanda
+  template:
+    metadata:
+      annotations:
+        checksum/config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        checksum-redpanda-chart/config: 9b98f0ff63c27ee306f6e826e2916b0a4f9479b25b07d4b598ed683aeb4c1c3c
+      labels:
+        app.kubernetes.io/name: console
+        app.kubernetes.io/instance: redpanda
+    spec:
+      serviceAccountName: redpanda-console
+      securityContext:
+        fsGroup: 99
+        runAsUser: 99
+      volumes:
+        - name: configs
+          configMap:
+            name: redpanda-console
+        - name: kafka-default-cert
+          secret:
+            defaultMode: 272
+            items:
+            - key: ca.crt
+              path: ca.crt
+            secretName: redpanda-default-cert
+        - name: schemaregistry-default-cert
+          secret:
+            defaultMode: 272
+            items:
+            - key: ca.crt
+              path: ca.crt
+            secretName: redpanda-default-cert
+        - name: adminapi-default-cert
+          secret:
+            defaultMode: 272
+            items:
+            - key: ca.crt
+              path: ca.crt
+            secretName: redpanda-default-cert
+      containers:
+        - name: console
+          args:
+            - "--config.filepath=/etc/console/configs/config.yaml"
+          securityContext:
+            runAsNonRoot: true
+          image: docker.redpanda.com/redpandadata/console:v2.4.5
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: configs
+              mountPath: /etc/console/configs
+              readOnly: true
+            - mountPath: /mnt/cert/kafka/default
+              name: kafka-default-cert
+              readOnly: true
+            - mountPath: /mnt/cert/schemaregistry/default
+              name: schemaregistry-default-cert
+              readOnly: true
+            - mountPath: /mnt/cert/adminapi/default
+              name: adminapi-default-cert
+              readOnly: true
+          livenessProbe:
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+            httpGet:
+              path: /admin/health
+              port: http
+          readinessProbe:
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+            httpGet:
+              path: /admin/health
+              port: http
+          resources:
+            {}
+          env:
+            - name: KAFKA_TLS_CAFILEPATH
+              value: /mnt/cert/kafka/default/ca.crt
+            - name: KAFKA_SCHEMAREGISTRY_TLS_CAFILEPATH
+              value: /mnt/cert/schemaregistry/default/ca.crt
+            - name: REDPANDA_ADMINAPI_TLS_ENABLED
+              value: "true"
+            - name: REDPANDA_ADMINAPI_TLS_CAFILEPATH
+              value: /mnt/cert/adminapi/default/ca.crt
+            - name: REDPANDA_ADMINAPI_ENABLED
+              value: "true"
+            - name: REDPANDA_ADMINAPI_URLS
+              value: https://redpanda.redpanda.svc.cluster.local.:9644
+

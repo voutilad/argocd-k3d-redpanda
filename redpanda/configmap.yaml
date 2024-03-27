@@ -1,0 +1,245 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redpanda
+  namespace: "redpanda"
+  labels:
+    app.kubernetes.io/component: redpanda
+    app.kubernetes.io/instance: redpanda
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redpanda
+    helm.sh/chart: redpanda-5.7.35
+data: 
+  
+  bootstrap.yaml: |
+    kafka_enable_authorization: false
+    enable_sasl: false
+    enable_rack_awareness: false
+          
+    default_topic_replications: 3
+    
+    compacted_log_segment_size: 67108864
+    group_topic_partitions: 16
+    kafka_batch_max_bytes: 1048576
+    kafka_connection_rate_limit: 1000
+    log_segment_size: 134217728
+    log_segment_size_max: 268435456
+    log_segment_size_min: 16777216
+    max_compacted_log_segment_size: 536870912
+    topic_partitions_per_shard: 1000
+    storage_min_free_bytes: 1073741824
+  
+    audit_enabled: false
+  
+  redpanda.yaml: |
+    config_file: /etc/redpanda/redpanda.yaml
+    redpanda:
+      empty_seed_starts_cluster: false
+      kafka_enable_authorization: false
+      enable_sasl: false
+      default_topic_replications: 3
+      compacted_log_segment_size: 67108864
+      group_topic_partitions: 16
+      kafka_batch_max_bytes: 1048576
+      kafka_connection_rate_limit: 1000
+      log_segment_size: 134217728
+      log_segment_size_max: 268435456
+      log_segment_size_min: 16777216
+      max_compacted_log_segment_size: 536870912
+      topic_partitions_per_shard: 1000
+      storage_min_free_bytes: 1073741824
+        
+      crash_loop_limit: "5"
+      audit_enabled: false
+  
+  
+      admin:
+        - name: internal
+          address: 0.0.0.0
+          port: 9644
+        - name: default
+          address: 0.0.0.0
+          port: 9645
+      admin_api_tls:
+        - name: internal
+          enabled: true
+          cert_file: /etc/tls/certs/default/tls.crt
+          key_file: /etc/tls/certs/default/tls.key
+          require_client_auth: false
+          truststore_file: /etc/tls/certs/default/ca.crt
+        - name: default
+          enabled: true
+          cert_file: /etc/tls/certs/external/tls.crt
+          key_file: /etc/tls/certs/external/tls.key
+          require_client_auth: false
+          truststore_file: /etc/tls/certs/external/ca.crt
+      kafka_api:
+        - name: internal
+          address: 0.0.0.0
+          port: 9093
+        - name: default
+          address: 0.0.0.0
+          port: 9094
+      kafka_api_tls:
+        - name: internal
+          enabled: true
+          cert_file: /etc/tls/certs/default/tls.crt
+          key_file: /etc/tls/certs/default/tls.key
+          require_client_auth: false
+          truststore_file: /etc/tls/certs/default/ca.crt
+        - name: default
+          enabled: true
+          cert_file: /etc/tls/certs/external/tls.crt
+          key_file: /etc/tls/certs/external/tls.key
+          require_client_auth: false
+          truststore_file: /etc/tls/certs/external/ca.crt
+      rpc_server:
+        address: 0.0.0.0
+        port: 33145
+      rpc_server_tls:
+        enabled: true
+        cert_file: /etc/tls/certs/default/tls.crt
+        key_file: /etc/tls/certs/default/tls.key
+        require_client_auth: false
+        truststore_file: /etc/tls/certs/default/ca.crt
+      seed_servers: 
+        - host:
+            address: redpanda-0.redpanda.redpanda.svc.cluster.local.
+            port: 33145
+        - host:
+            address: redpanda-1.redpanda.redpanda.svc.cluster.local.
+            port: 33145
+        - host:
+            address: redpanda-2.redpanda.redpanda.svc.cluster.local.
+            port: 33145
+  
+    schema_registry_client:
+      brokers:
+      - address: redpanda-0.redpanda.redpanda.svc.cluster.local.
+        port: 9093
+      - address: redpanda-1.redpanda.redpanda.svc.cluster.local.
+        port: 9093
+      - address: redpanda-2.redpanda.redpanda.svc.cluster.local.
+        port: 9093
+      broker_tls:
+        enabled: true
+        require_client_auth: false
+        cert_file: /etc/tls/certs/default/tls.crt
+        key_file: /etc/tls/certs/default/tls.key
+        truststore_file: /etc/tls/certs/default/ca.crt
+    schema_registry:
+      schema_registry_api:
+        - name: internal
+          address: 0.0.0.0
+          port: 8081
+        - name: default
+          address: 0.0.0.0
+          port: 8084
+      schema_registry_api_tls:
+        - name: internal
+          enabled: true
+          cert_file: /etc/tls/certs/default/tls.crt
+          key_file: /etc/tls/certs/default/tls.key
+          require_client_auth: false
+          truststore_file: /etc/tls/certs/default/ca.crt
+        - name: default
+          enabled: true
+          cert_file: /etc/tls/certs/external/tls.crt
+          key_file: /etc/tls/certs/external/tls.key
+          require_client_auth: false
+          truststore_file: /etc/tls/certs/external/ca.crt
+  
+    pandaproxy_client:
+      brokers:
+      - address: redpanda-0.redpanda.redpanda.svc.cluster.local.
+        port: 9093
+      - address: redpanda-1.redpanda.redpanda.svc.cluster.local.
+        port: 9093
+      - address: redpanda-2.redpanda.redpanda.svc.cluster.local.
+        port: 9093
+      broker_tls:
+        enabled: true
+        require_client_auth: false
+        cert_file: /etc/tls/certs/default/tls.crt
+        key_file: /etc/tls/certs/default/tls.key
+        truststore_file: /etc/tls/certs/default/ca.crt
+    pandaproxy:
+      pandaproxy_api:
+        - name: internal
+          address: 0.0.0.0
+          port: 8082
+        - name: default
+          address: 0.0.0.0
+          port: 8083
+      pandaproxy_api_tls:
+        - name: internal
+          enabled: true
+          cert_file: /etc/tls/certs/default/tls.crt
+          key_file: /etc/tls/certs/default/tls.key
+          require_client_auth: false
+          truststore_file: /etc/tls/certs/default/ca.crt
+        - name: default
+          enabled: true
+          cert_file: /etc/tls/certs/external/tls.crt
+          key_file: /etc/tls/certs/external/tls.key
+          require_client_auth: false
+          truststore_file: /etc/tls/certs/external/ca.crt
+  
+    
+    rpk:
+      # redpanda server configuration
+      overprovisioned: true
+      enable_memory_locking: false
+      additional_start_flags:
+        - "--smp=1"
+        - "--memory=1638M"
+        - "--reserve-memory=204M"
+        - "--default-log-level=info"
+      # rpk tune entries
+      tune_aio_events: true
+    
+      # kafka connection configuration
+      kafka_api:
+        brokers: 
+          - redpanda-0.redpanda.redpanda.svc.cluster.local.:9093
+          - redpanda-1.redpanda.redpanda.svc.cluster.local.:9093
+          - redpanda-2.redpanda.redpanda.svc.cluster.local.:9093
+        tls:
+          truststore_file: /etc/tls/certs/default/ca.crt
+      admin_api:
+        addresses: 
+          - redpanda-0.redpanda.redpanda.svc.cluster.local.:9644
+          - redpanda-1.redpanda.redpanda.svc.cluster.local.:9644
+          - redpanda-2.redpanda.redpanda.svc.cluster.local.:9644
+        tls:
+          truststore_file: /etc/tls/certs/default/ca.crt
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redpanda-rpk
+  namespace: "redpanda"
+  labels:
+    app.kubernetes.io/component: redpanda
+    app.kubernetes.io/instance: redpanda
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redpanda
+    helm.sh/chart: redpanda-5.7.35
+data:
+  profile: | 
+    name: default
+    kafka_api:
+      brokers: 
+          - redpanda-0:31092
+          - redpanda-1:31092
+          - redpanda-2:31092
+      tls:
+        ca_file: ca.crt
+    admin_api:
+      addresses: 
+          - redpanda-0:31644
+          - redpanda-1:31644
+          - redpanda-2:31644
+      tls:
+        ca_file: ca.crt

@@ -1,0 +1,82 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: redpanda-configuration
+  namespace: "redpanda"
+  labels:
+    app.kubernetes.io/component: redpanda
+    app.kubernetes.io/instance: redpanda
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redpanda
+    helm.sh/chart: redpanda-5.7.35
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-weight": "-5"
+spec:
+  template:
+    metadata:
+      generateName: "redpanda-post-"
+      labels:
+        app.kubernetes.io/name: redpanda
+        app.kubernetes.io/instance: "redpanda"
+        app.kubernetes.io/component: redpanda-post-install
+    spec:
+      affinity:
+        {}
+      restartPolicy: Never
+      securityContext: 
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+      - name: redpanda-post-install
+        image: docker.redpanda.com/redpandadata/redpanda:v23.3.9
+        
+        env: []
+        command: ["bash","-c"]
+        args:
+          - |
+            set -e
+            if [[ -n "$REDPANDA_LICENSE" ]] then
+              rpk cluster license set "$REDPANDA_LICENSE"
+            fi
+
+            
+
+            
+            rpk cluster config export -f /tmp/cfg.yml
+
+            
+            for KEY in "${!RPK_@}"; do
+              config="${KEY#*RPK_}"
+              rpk redpanda config set --config /tmp/cfg.yml "${config,,}" "${!KEY}"
+            done
+
+            
+            rpk cluster config import -f /tmp/cfg.yml
+        securityContext:
+          runAsGroup: 101
+          runAsUser: 101
+        volumeMounts:
+          - name: config
+            mountPath: /etc/redpanda
+          - name: redpanda-default-cert
+            mountPath: /etc/tls/certs/default
+          - name: redpanda-external-cert
+            mountPath: /etc/tls/certs/external
+      volumes: 
+        - name: config
+          configMap:
+            name: redpanda
+        - name: redpanda-default-cert
+          secret:
+            secretName: redpanda-default-cert
+            defaultMode: 0o440
+        - name: redpanda-external-cert
+          secret:
+            secretName: redpanda-external-cert
+            defaultMode: 0o440
+      serviceAccountName: default

@@ -1,0 +1,72 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: redpanda-default-cert
+  namespace: "redpanda"
+  labels:
+    app.kubernetes.io/component: redpanda
+    app.kubernetes.io/instance: redpanda
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redpanda
+    helm.sh/chart: redpanda-5.7.35
+spec:
+  dnsNames:
+    - redpanda-cluster.redpanda.redpanda.svc.cluster.local
+    - redpanda-cluster.redpanda.redpanda.svc
+    - redpanda-cluster.redpanda.redpanda
+    - "*.redpanda-cluster.redpanda.redpanda.svc.cluster.local"
+    - "*.redpanda-cluster.redpanda.redpanda.svc"
+    - "*.redpanda-cluster.redpanda.redpanda"
+    - redpanda.redpanda.svc.cluster.local
+    - redpanda.redpanda.svc
+    - redpanda.redpanda
+    - "*.redpanda.redpanda.svc.cluster.local"
+    - "*.redpanda.redpanda.svc"
+    - "*.redpanda.redpanda"
+  duration: 43800h
+  isCA: false
+  secretName: redpanda-default-cert
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: redpanda-default-root-issuer
+    kind: Issuer
+    group: cert-manager.io
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: redpanda-external-cert
+  namespace: "redpanda"
+  labels:
+    app.kubernetes.io/component: redpanda
+    app.kubernetes.io/instance: redpanda
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redpanda
+    helm.sh/chart: redpanda-5.7.35
+spec:
+  dnsNames:
+    - redpanda-cluster.redpanda.redpanda.svc.cluster.local
+    - redpanda-cluster.redpanda.redpanda.svc
+    - redpanda-cluster.redpanda.redpanda
+    - "*.redpanda-cluster.redpanda.redpanda.svc.cluster.local"
+    - "*.redpanda-cluster.redpanda.redpanda.svc"
+    - "*.redpanda-cluster.redpanda.redpanda"
+    - redpanda.redpanda.svc.cluster.local
+    - redpanda.redpanda.svc
+    - redpanda.redpanda
+    - "*.redpanda.redpanda.svc.cluster.local"
+    - "*.redpanda.redpanda.svc"
+    - "*.redpanda.redpanda"
+  duration: 43800h
+  isCA: false
+  secretName: redpanda-external-cert
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: redpanda-external-root-issuer
+    kind: Issuer
+    group: cert-manager.io
