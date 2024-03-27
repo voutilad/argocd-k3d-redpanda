@@ -19,8 +19,8 @@ for cmd in k3d helm kubectl; do
 done
 
 ### 1. We need a k3d cluster.
-echo "> Looking for existing k3d Redpanda cluster..."
-if ! k3d cluster list redpanda 2>&1 > /dev/null; then
+echo "> Looking for existing k3d cluster..."
+if ! k3d cluster list "${K3D_CLUSTER}" 2>&1 > /dev/null; then
     echo ">> Creating a new ${SERVERS} node cluster..."
     k3d cluster create "${K3D_CLUSTER}" \
         --servers "${SERVERS}" --servers-memory "1.5G" \
@@ -28,7 +28,7 @@ if ! k3d cluster list redpanda 2>&1 > /dev/null; then
         --registry-create rp-registry
 else
     echo ">> Found! Making sure cluster is started..."
-    k3d cluster start redpanda --wait 2>&1 > /dev/null
+    k3d cluster start "${K3D_CLUSTER}" --wait 2>&1 > /dev/null
 fi
 
 ### 2. Install ArgoCD
