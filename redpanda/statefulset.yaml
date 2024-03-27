@@ -274,7 +274,7 @@ spec:
             defaultMode: 0o440
         - name: users
           secret:
-            secretName: redpanda-superusers
+            secretName: redpanda-superuser
         - name: lifecycle-scripts
           secret:
             secretName: redpanda-sts-lifecycle

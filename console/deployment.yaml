@@ -35,7 +35,7 @@ spec:
             name: redpanda-console
         - name: redpanda-users
           secret:
-            secretName: redpanda-superusers
+            secretName: redpanda-superuser
         - name: kafka-default-cert
           secret:
             defaultMode: 272

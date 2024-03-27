@@ -74,4 +74,4 @@ spec:
             defaultMode: 0o440
         - name: users
           secret:
-            secretName: redpanda-superusers
+            secretName: redpanda-superuser
